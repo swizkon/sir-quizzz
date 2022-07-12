@@ -9,7 +9,7 @@ app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-quizzes = [{"id": 1, "name": "QL Quiz I test"},{"id": 2,"name": "QL Quiz II draft"}]
+quiz_repository = [{"id": 1, "name": "QL Quiz I test"},{"id": 2,"name": "QL Quiz II draft"}]
 
 html = """
 <!DOCTYPE html>
@@ -57,11 +57,13 @@ manager = ConnectionManager()
 
 @app.get("/quiz/list")
 async def quiz_list():
-    return {"data": quizzes}
+    return {"data": quiz_repository}
     
 @app.post("/quiz")
 async def create_quiz(new_quiz: CreateQuiz):
-    return {"data": new_quiz}
+    new_entry = new_quiz.dict()
+    quiz_repository.append(new_entry)
+    return {"data": quiz_repository}
 
 
 @app.get("/")
