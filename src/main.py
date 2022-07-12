@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Response
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from models import CreateQuiz
@@ -10,6 +10,11 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 quiz_repository = [{"id": 1, "name": "QL Quiz I test"},{"id": 2,"name": "QL Quiz II draft"}]
+
+def find_quiz_by_id(id):
+    for q in quiz_repository:
+        if(q['id'] == id):
+            return q
 
 html = """
 <!DOCTYPE html>
@@ -55,9 +60,16 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-@app.get("/quiz/list")
+@app.get("/quiz")
 async def quiz_list():
     return {"data": quiz_repository}
+    
+@app.get("/quiz/{id}")
+async def quiz_details(id: int, response: Response):
+    p = find_quiz_by_id(id)
+    if not p:
+        response.status_code = 404
+    return {"data": p}
     
 @app.post("/quiz")
 async def create_quiz(new_quiz: CreateQuiz):
