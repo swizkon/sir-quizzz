@@ -1,10 +1,9 @@
 from typing import List
 
-from pydantic import BaseModel
-
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from models import CreateQuiz
 
 app = FastAPI()
 
@@ -59,6 +58,10 @@ manager = ConnectionManager()
 @app.get("/quiz/list")
 async def quiz_list():
     return {"data": quizzes}
+    
+@app.post("/quiz")
+async def create_quiz(new_quiz: CreateQuiz):
+    return {"data": new_quiz}
 
 
 @app.get("/")
